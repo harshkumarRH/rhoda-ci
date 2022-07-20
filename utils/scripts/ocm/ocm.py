@@ -245,7 +245,7 @@ class OpenshiftClusterManager:
             data = yaml.safe_load(fh)
         console_url = self.get_osd_cluster_console_url()
         data["OCP_CONSOLE_URL"] = console_url
-        data["OCP_API_URL"] = self.get_osd_cluster_api_url(console_url)
+        data["OCP_API_URL"] = self.get_osd_cluster_api_url()
         cluster_version = self.get_osd_cluster_version()
         data["CLUSTER_VERSION"] = cluster_version
         data["OCP_ADMIN_USER"] = {}
@@ -256,11 +256,18 @@ class OpenshiftClusterManager:
             yaml_file.write(yaml.dump(data, default_flow_style=False, sort_keys=False))
         log.info("success!")
 
-    def get_osd_cluster_api_url(self, console_url):
-        """Updates osd cluster api url from console url"""
-        cluster_api_url = console_url.replace("console-openshift-console.apps", "api")
-        cluster_api_url = re.sub(r"/$", "", cluster_api_url) + ":6443"
-        return cluster_api_url
+    def get_osd_cluster_api_url(self):
+        """Gets osd cluster api url"""
+
+        filter_str = "--json | jq -j '.api.url'"
+        cluster_api_url = self.ocm_describe(filter=filter_str)
+        if cluster_api_url is None:
+            log.info(
+                "Unable to retrieve cluster api url "
+                "for cluster name {}. EXITING".format(self.cluster_name)
+            )
+            sys.exit(1)
+        return cluster_api_url.strip("\n")
 
     def update_osd_cluster_info(self, config_file="rhoda_config_file.yaml"):
         """Updates osd cluster information and stores in config file"""
@@ -746,6 +753,20 @@ class OpenshiftClusterManager:
         else:
             log.info("Operator is not installed on this cluster")
 
+    def oc_login_as_admin(self):
+        """Login to Cluster as Admin using oc cli"""
+
+        cmd = "oc login {} -u {} -p {} ".format(self.get_osd_cluster_api_url(),
+                                                 self.htpasswd_cluster_admin,
+                                                 self.htpasswd_cluster_password)
+
+        log.info("CMD: {}".format(cmd))
+        ret = execute_command(cmd, True)
+        log.info(ret)
+        if ret is None:
+            log.info("Failed to login to Cluster {} through OC cli".format(self.cluster_name))
+            sys.exit(1)
+
 
 if __name__ == "__main__":
     # Instance for OpenshiftClusterManager Class
@@ -1190,6 +1211,43 @@ if __name__ == "__main__":
     )
     uninstall_rhods_parser.set_defaults(func=ocm_obj.uninstall_rhods_addon)
 
+    # Argument parsers for oc_login_as_admin
+    oc_login_parser = subparsers.add_parser(
+        "oc_login",
+        help=("Login to Cluster through OC CLI"),
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+
+    optional_oc_login_parser = oc_login_parser._action_groups.pop()
+    required_oc_login_parser = oc_login_parser.add_argument_group(
+        "required arguments"
+    )
+    oc_login_parser._action_groups.append(optional_oc_login_parser)
+
+    required_oc_login_parser.add_argument(
+        "--cluster",
+        help="Cluster name",
+        action="store",
+        dest="cluster_name",
+        required=True,
+    )
+    optional_oc_login_parser.add_argument(
+        "--htpasswd-cluster-admin ",
+        help="Cluster admin user of idp type htpasswd",
+        action="store",
+        dest="htpasswd_cluster_admin",
+        metavar=" ",
+        default="htpasswd-cluster-admin-user",
+    )
+    required_oc_login_parser.add_argument(
+        "--htpasswd-cluster-password",
+        help="htpasswd Cluster admin password",
+        action="store",
+        dest="htpasswd_cluster_password",
+        required=True
+    )
+    oc_login_parser.set_defaults(func=ocm_obj.oc_login_as_admin)
+
     # Argument parsers for install_rhoda_addon
     install_rhoda_parser = subparsers.add_parser(
         "install_rhoda_addon",
@@ -1225,6 +1283,7 @@ if __name__ == "__main__":
         required=True,
     )
     uninstall_rhoda_parser.set_defaults(func=ocm_obj.uninstall_rhoda_addon)
+
     # Argument parsers for create_idp
     create_idp_parser = subparsers.add_parser(
         "create_idp",

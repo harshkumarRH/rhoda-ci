@@ -7,12 +7,12 @@ Resource            ../resources/keywords/provision_dbinstance.resource
 Suite Setup         Set Library Search Order    SeleniumLibrary
 Suite Teardown      Tear Down The Test Suite
 Test Setup          Given The Browser Is On Openshift Home Screen
-Test Teardown       Close Browser
+Test Teardown       Tear Down The Test Case
 
 
 *** Test Cases ***
 Scenario: Provision MongoDB Database Instance for Invalid Provider Account from Developers View
-    [Tags]    smoke    RHOD-60-dev
+    [Tags]    smoke    RHOD-60-dev    inv
     When User Imports Invalid MongoDB Provider Account
     And User Navigates To Create Database Instance Screen On Developer View
     Then DBSC Instance Retrieval Failed On Dev View

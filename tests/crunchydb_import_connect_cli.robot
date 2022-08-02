@@ -7,7 +7,7 @@ Resource            ../resources/keywords/deploy_application.resource
 Suite Setup         Set Library Search Order    OpenShiftLibrary
 Suite Teardown      Tear Down The Test Suite
 Test Setup          Given Login To OpenShift CLI
-Test Teardown       Logout Of OpenShift CLI
+Test Teardown       Tear Down The Test Case
 
 
 *** Test Cases ***

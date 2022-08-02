@@ -6,6 +6,7 @@ Library     OpenShiftLibrary
 Library     ../../utils/scripts/dbaas_utils.py
 Library     ../../utils/scripts/util.py
 Resource    ../object_repo/login_obj.resource
+Resource    ../keywords/setup_teardown.resource
 
 
 *** Keywords ***
@@ -14,7 +15,7 @@ The Browser Is On Openshift Home Screen
     Open Browser    ${OCP_CONSOLE_URL}    browser=${BROWSER.NAME}    options=${BROWSER.OPTIONS}
     Select Login Authentication Type    ${OCP_ADMIN_USER.AUTH_TYPE}
     Login To Openshift
-    Oc Login    ${OCP_API_URL}    ${OCP_ADMIN_USER.USERNAME}     ${OCP_ADMIN_USER.PASSWORD}
+    Login To OpenShift CLI
 
 Login To OpenShift CLI
     Oc Login    ${OCP_API_URL}    ${OCP_ADMIN_USER.USERNAME}     ${OCP_ADMIN_USER.PASSWORD}
@@ -58,6 +59,3 @@ User Closes Welcome Message
     ${welcomeTile}=     Run Keyword And Return Status    Wait Until Page Contains Element    ${elemWelcomeTile}     timeout=15s
     Run Keyword If    ${welcomeTile}
     ...    Click Element    ${btnWelcomTileClose}
-
-Tear Down The Test Suite
-    Log    Test Suite Test Down

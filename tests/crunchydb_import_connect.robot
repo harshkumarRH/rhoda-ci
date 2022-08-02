@@ -20,7 +20,7 @@ Scenario: Import CrunchyDB Provider Account From Developer View
     Then Provider Account Import Success
 
 Scenario: Verify error message for invalid credentials on CrunchyDB
-    [Tags]    smoke    RHOD-49-2
+    [Tags]    smoke    RHOD-49-2    inv
     When User Filters Project redhat-dbaas-operator On Project DropDown And Navigates To Database Access Page
     And User Navigates To Import Database Provider Account Screen From Database Access Page
     And User Enters Invalid Data To Import CrunchyDB Provider Account

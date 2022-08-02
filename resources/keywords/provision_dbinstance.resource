@@ -51,9 +51,10 @@ User Enters Data To Create Instance On Dev View
     ${instanceName}=    Get Instance Name   dev
     Set Test Variable    ${instanceName}
     Input Text    ${txtBxInstName}    ${instanceName}
+    ${mongoProj}=     Get Project Name    ${TEST TAGS}
     Run Keyword If    "Mongo" in """${DBProvider}"""    Run Keywords
     ...    Element Should Be Visible    ${txtBxProjName}
-    ...    AND    Input Text    ${txtBxProjName}    ${newProject}
+    ...    AND    Input Text    ${txtBxProjName}    ${mongoProj}
     Element Should Be Visible    ${btnCreateEnabled}
     Click Element    ${btnCreateEnabled}
     Element Should Be Visible    ${txtCreatingDBInst}
@@ -70,6 +71,7 @@ DBSC Instance Provisioned Successfully
     Element Should Be Visible    ${txtCreationInfo}
     Element Should Be Visible    ${btnViewDBInst}
     Click Button    ${btnViewDBInst}
+    Set Suite Variable    ${instanceName}
 
 DBSC Instance Available On DataBase Access Page
     Wait Until Keyword Succeeds     5x     2s   Filter DBSC Instance Until Success

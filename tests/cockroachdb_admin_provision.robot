@@ -8,12 +8,12 @@ Resource            ../resources/keywords/provision_dbinstance.resource
 Suite Setup         Set Library Search Order    SeleniumLibrary
 Suite Teardown      Tear Down The Test Suite
 Test Setup          Given The Browser Is On Openshift Home Screen
-Test Teardown       Close Browser
+Test Teardown       Tear Down The Test Case
 
 
 *** Test Cases ***
 Scenario: Provision CockroachDB Database Instance for Invalid Provider Account from Administrator View
-    [Tags]    smoke    RHOD-57-1
+    [Tags]    smoke    RHOD-57-1   inv
     When User Imports Invalid Cockroach Provider Account
     And User Navigates To Create Database Instance Screen From Database Access Page
     And User Selects DBProvider And Provider Account

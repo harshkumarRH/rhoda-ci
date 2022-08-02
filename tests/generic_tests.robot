@@ -9,7 +9,7 @@ Resource            ../resources/keywords/import_provider_account.resource
 Suite Setup         Set Library Search Order    SeleniumLibrary
 Suite Teardown      Tear Down The Test Suite
 Test Setup          Given The Browser Is On Openshift Home Screen
-Test Teardown       Close Browser
+Test Teardown       Tear Down The Test Case
 
 
 *** Test Cases ***
